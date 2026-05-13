@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Free Fire MAX — Knowledge Panel + Infinity Sensitivity</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d0d1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0e0ef9; }
+        ::-webkit-scrollbar-thumb { background: #e94560; border-radius: 4px; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position:fixed; top: 0; left: 0;
+            width: 240px; height: 100vh;
+            background: #16162a;
+            border-right: 1px solid #2a2a4a;
+            padding: 24px 16px; overflow-y: auto;
+            z-index: 100; transition: transform 0.3s ease;
+        }
+        .sidebar-logo {
+            font-size: 22px; font-weight: 800;
+            color: #e94560; margin-bottom: 28px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sidebar-logo span { color: #fff; }
+        .sidebar nav a {
+            display: block; padding: 10px 14px;
+            color: #a0a0c0; text-decoration: none;
+            border-radius: 8px; margin-bottom: 4px;
+            font-size: 14px; transition: all 0.2s;
+        }
+        .sidebar nav a:hover, .sidebar nav a.active {
+            background: #e94560; color: #fff;
+        }
+        .sidebar nav a i { margin-right: 10px; width: 18px; display: inline-block; }
+
+        /* ── Main ── */
+        .main { margin-left: 240px; padding: 32px 40px; max-width: 1100px; }
+
+        /* ── Hero ── */
+        .hero {
+            background: linear-gradient(135deg, #1a1a3e 0%, #e94560 100%);
+            border-radius: 16px; padding: 40px 36px;
+            margin-bottom: 36px; position: relative; overflow: hidden;
+        }
+        .hero::after {
+            content: ''; position: absolute;
+            top: -50%; right: -20%;
+            width: 400px; height: 400px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .hero h1 { font-size: 36px; font-weight: 800; position: relative; z-index: 1; }
+        .hero h1 span { color: #ffd700; }
+        .hero p { font-size: 16px; opacity: 0.9; margin-top: 8px; position: relative; z-index: 1; max-width: 600px; }
+
+        section { margin-bottom: 48px; }
+        section h2 {
+            font-size: 24px; font-weight: 700; margin-bottom: 20px;
+            padding-bottom: 8px; border-bottom: 2px solid #e94560;
+            display: inline-block;
+        }
+        section h2 .badge {
+            font-size: 12px; background: #e94560; color: #fff;
+            padding: 2px 10px; border-radius: 20px; margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .card-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .card {
+            background: #1a1a2e; border: 1px solid #2a2a4a;
+            border-radius: 12px; padding: 18px 20px;
+            transition: all 0.25s;
+        }
+        .card:hover {
+            border-color: #e94560; transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(233,69,96,0.15);
+        }
+        .card h3 { font-size: 16px; color: #e94560; margin-bottom: 6px; }
+        .card .tag {
+            display: inline-block; font-size: 11px; padding: 2px 10px;
+            border-radius: 12px; margin-bottom: 8px; font-weight: 600;
+        }
+        .card p { font-size: 13px; color: #a0a0c0; }
+        .card .stat {
+            display: flex; justify-content: space-between;
+            font-size: 12px; margin-top: 6px; color: #888;
+        }
+
+        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #2a2a4a; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        thead { background: #16162a; }
+        th, td { padding: 10px 16px; text-align: left; border-bottom: 1px solid #2a2a4a; }
+        th { color: #e94560; font-weight: 600; }
+        tr:hover td { background: #1e1e38; }
+
+        /* ── INFINITY SENSITIVITY TOOL ── */
+        .infinity-section {
+            background: linear-gradient(145deg, #1a1a3e 0%, #2a1a3e 100%);
+            border: 2px solid #87e945;
+            border-radius: 20px;
+            padding: 36px;
+            margin-bottom: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        .infinity-section::before {
+            content: '∞';
+            position: absolute;
+            top: -30px; right: 20px;
+            font-size: 160px;
+            color: rgba(233,69,96,0.06);
+            font-weight: 900;
+        }
+        .infinity-header {
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 24px;
+        }
+        .infinity-header h2 {
+            font-size: 28px; font-weight: 800;
+            border: none; padding: 0; margin: 0;
+            background: linear-gradient(90deg, #e94560, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .infinity-header .sub {
+            font-size: 13px; color: #abf608;
+            -webkit-text-fill-color: #3407ea;
+        }
+        .infinity-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+        @media (max-width: 900px) {
+            .infinity-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Input side */
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e94560;
+            margin-bottom: 6px;
+        } 
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0d0d1a;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        .input-group input:focus, .input-group    select:focus {
+            border-color: #e94560;
+            box-shadow: 0 0 20px rgba(233,69,96,0.15);
+        }
+        .input-group input::placeholder { color: #555; }
+        .input-group select option { background: #16162a; color: #e0e0e0; }
+
+        .search-wrapper {
+            position: relative;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+            background: #16162a;
+            border: 1px solid #2a2a4a;
+            border-radius: 0 0 10px 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 50;
+        }
+        .search-results.show { display: block; }
+        .search-results div {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #2a2a4a;
+            transition: background 0.2s;
+        }
+        .search-results div:hover { background: #e94560; color: #fff; }
+        .search-results .no-result {
+            color: #888; cursor: default;
+        }
+        .search-results .no-result:hover { background: transparent; color: #888; }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #e94560, #ff6b81);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(233,69,96,0.4);
+        }
+        .generate-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Result side */
+        .result-box {
+            background: #0d0d1a;
+            border: 1px solid #2a2a4a;
+            border-radius: 16px;
+            padding: 24px;
+            min-height: 320px;
+            transition: all 0.4s;
+        }
+        .result-box.has-result {
+            border-color: #e94560;
+            box-shadow: 0 0 40px rgba(233,69,96,0.1);
+        }
+        .result-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 260px;
+            color: #444;
+            text-align: center;
+        }
+        .result-placeholder .big-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        .result-placeholder p { font-size: 14px; }
+
+        .result-content { display: none; }
+        .result-content.show { display: block; }
+
+        .result-device {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffd700;
+            margin-bottom: 4px;
+        }
+        .result-dpi {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 18px;
+        }
+        .result-sensi {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .result-sensi-item {
+            background: #1a1a2e;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+        }
+        .result-sensi-item .rs-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .result-sensi-item .rs-value {
+            font-size: 30px;
+            font-weight: 900;
+            color: #e94560;
+            line-height: 1.2;
+        }
+        .result-sensi-item .rs-value.zero { color: #2979ff; }
+        .result-note {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(233,69,96,0.1);
+            border-left: 3px solid #e94560;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #a0a0c0;
+        }
+        .result-note strong { color: #ffd700; }
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(233,69,96,0.15);
+            color: #e94560;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .ai-badge .pulse {
+            width: 6px; height: 6px;
+            background: #e94560;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        /* ── Sensitivity Tables (updated to max 200) ── */
+        .sens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .sens-item {
+            background: #1a1a2e;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .sens-item .label { font-size: 12px; color: #888; }
+        .sens-item .value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #e94560;
+        }
+
+        /* ── Maps ── */
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .map-card {
+            background: #1a1a2e;
+            border: 1px solid #2a2a4a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .map-card .map-header {
+            background: #16162a; padding: 14px 18px;
+            font-weight: 700; color: #e94560;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        .map-card .map-body { padding: 14px 18px; }
+        .map-card .map-body p { font-size: 13px; color: #a0a0c0; }
+
+        .tip-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .tip-item {
+            background: #1a1a2e; border: 1px solid #2a2a4a;
+            border-radius: 12px; padding: 18px;
+            display: flex; gap: 14px; align-items: flex-start;
+        }
+        .tip-item .num {
+            background: #e94560; color: #fff;
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; flex-shrink: 0;
+        }
+        .tip-item h4 { font-size: 15px; margin-bottom: 4px; }
+        .tip-item p { font-size: 13px; color: #a0a0c0; }
+
+        footer {
+            margin-top: 48px; padding: 20px 0;
+            border-top: 1px solid #2a2a4a;
+            font-size: 13px; color: #666; text-align: center;
+        }
+        .gloo-divider {
+            text-align: center; margin: 24px 0;
+            color: #2a2a4a; font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 220px;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 20px 16px; }
+            .hero h1 { font-size: 26px; }
+            .hero { padding: 28px 20px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .tip-list { grid-template-columns: 1fr; }
+            .infinity-section { padding: 24px 18px; }
+            .result-sensi { grid-template-columns: 1fr; }
+        }
+        .menu-toggle {
+            display: none;
+            position: fixed; top: 16px; left: 16px;
+            z-index: 200;
+            background: #e94560; border: none;
+            color: #fff; width: 42px; height: 42px;
+            border-radius: 10px; font-size: 20px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; align-items: center; justify-content: center; }
+        }
+
+        .ram-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-logo">FF<span>MAX</span> <span style="font-size:12px;color:#888;font-weight:400;">Knowledge</span></div>
+    <nav>
+        <a href="#overview" class="active">📊 Overview</a>
+        <a href="#characters">🧑 Characters</a>
+        <a href="#weapons">🔫 Weapons</a>
+        <a href="#maps">🗺️ Maps</a>
+        <a href="#modes">🎮 Game Modes</a>
+        <a href="#sensitivity">🎯 Sensitivity</a>
+        <a href="#infinity-sensitivity">∞ Infinity Sensi</a>
+        <a href="#tips">💡 Pro Tips</a>
+    </nav>
+</aside>
+
+<div class="main">
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>Free Fire <span>MAX</span></h1>
+        <p>Your complete knowledge panel — characters, weapons, maps, game modes, <strong>∞ Infinity Sensitivity</strong>, and pro tips. Everything a player needs.</p>
+    </div>
+
+    <!-- ========== OVERVIEW ========== -->
+    <section id="overview">
+        <h2>📊 Overview</h2>
+        <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+            <div class="card"><h3>👥 Players</h3><p>50 players per BR match. Solo / Duo / Squad (4).</p></div>
+            <div class="card"><h3>⏱️ Match Duration</h3><p>~10–15 minutes per BR match. Fast-paced battle royale.</p></div>
+            <div class="card"><h3>💎 Currency</h3><p>Gold (earned) + Diamonds (premium). Used for characters, skins, crates.</p></div>
+            <div class="card"><h3>📈 Ranked Tiers</h3><p>Bronze → Silver → Gold → Platinum → Diamond → Heroic → Grandmaster</p></div>
+            <div class="card"><h3>🛡️ Gloo Wall</h3><p>Portable cover. Carry up to 2. Can be shot through by some weapons.</p></div>
+            <div class="card"><h3>🔄 Revival</h3><p>Teammates can revive you at a safe spot. Use revive tokens in some modes.</p></div>
+        </div>
+    </section>
+
+    <!-- ========== CHARACTERS ========== -->
+    <section id="characters">
+        <h2>🧑 Characters <span class="badge">40+</span></h2>
+        <p style="margin-bottom:16px;color:#a0a0c0;">Characters provide unique active (manual activation) or passive (always-on) abilities. Build synergies with 1 active + 3 passive slots.</p>
+        <h3 style="color:#e94560;margin-bottom:12px;font-size:16px;">🔥 Top Tier Characters</h3>
+        <div class="card-grid">
+            <div class="card">
+                <span class="tag tag-active">Active</span>
+                <h3>Alok 💃</h3>
+                <p><strong>Drop the Beat:</strong> 5m aura — restores HP + boosts movement speed for allies. 45s cooldown.</p>
+                <div class="stat"><span>Cost: 599 Diamonds</span><span>S-Tier</span></div>
+            </div>
+            <div class="card">
+                <span class="tag tag-active">Active</span>
+                <h3>Skyler 🎸</h3>
+                <p><strong>Riptide Rhythm:</strong> Breaks nearby gloo walls + heals when placing your own gloo. 45s CD.</p>
+                <div class="stat"><span>Cost: 499 Diamonds</span><span>S-Tier</span></div>
+            </div>
+            <div class="card">
+                <span class="tag tag-active">Active</span>
+                <h3>K 👑</h3>
+                <p><strong>Master of All:</strong> Refills EP. In Jiu-Jitsu mode, converts EP to HP faster. 45s CD.</p>
+                <div class="stat"><span>Cost: 499 Diamonds</span><span>S-Tier</span></div>
+            </div>
+            <div class="card">
+                <span class="tag tag-passive">Passive</span>
+                <h3>Kelly 🏃</h3>
+                <p><strong>Dash:</strong> Increases sprint speed. Awakened: Kelly "The Swift" — dash deals damage on collision.</p>
+                <div class="stat"><span>Free / 1000 Gold</span><span>S-Tier</span></div>
+            </div>
+            <div class="card">
+                <span class="tag tag-passive">Passive</span>
+                <h3>Hayato ⚔️</h3>
+                <p><strong>Bushido:</strong> Reduced HP = increased armor penetration. Awakened: Hayato "Firebrand" — extra damage.</p>
+                <div class="stat"><span>Free / 1000 Gold</span><span>A-Tier</span></div>
+            </div>
+            <div class="card">
+                <span class="tag tag-active">Active</span>
+                <h3>Chrono 🛡️</h3>
+                <p><strong>Time Turner:</strong> Creates a shield that blocks damage. Can shoot from inside. 40s CD.</p>
+                <div class="stat"><span>599 Diamonds</span><span>A-Tier</span></div>
+            </div>
+        </div>
+        <h3 style="color:#e94560;margin-top:24px;margin-bottom:12px;font-size:16px;">🧠 Popular Ability Combos</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Combo</th><th>Active</th><th>Passives</th><th>Playstyle</th></tr></thead>
+                <tbody>
+                    <tr><td>Rusher</td><td>Alok</td><td>Kelly + Joseph + Iris</td><td>Speed + healing + gloo pierce. Aggressive push.</td></tr>
+                    <tr><td>Survivor</td><td>Skyler</td><td>Ford + Dimitri + Hayato</td><td>Zone survival + gloo control. Great for edge play.</td></tr>
+                    <tr><td>Sniper</td><td>K</td><td>Laura + Maro + Dasha</td><td>EP management + accuracy. Long-range dominance.</td></tr>
+                    <tr><td>Support</td><td>Dimitri</td><td>Alok + Moco + Miguel</td><td>Healing zone + enemy reveal. Team anchor.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ========== WEAPONS ========== -->
+    <section id="weapons">
+        <h2>🔫 Weapons <span class="badge">Tier List</span></h2>
+        <div class="table-wrap" style="margin-bottom:20px;">
+            <table>
+                <thead><tr><th>Category</th><th>S-Tier</th><th>A-Tier</th><th>B-Tier</th><th>Notes</th></tr></thead>
+                <tbody>
+                    <tr><td>Assault Rifles</td><td>Groza</td><td>M4A1-X, AK-47, AUG</td><td>SCAR, AN94, XM8</td><td>Groza: best AR overall. M4A1-X: improved stability.</td></tr>
+                    <tr><td>SMGs</td><td>MP5</td><td>Vector, PP-19 Bizon</td><td>UMP, P90</td><td>MP5: low recoil, high fire rate. Great for close-mid.</td></tr>
+                    <tr><td>Shotguns</td><td>M1887</td><td>SPAS-12, M1014</td><td>Mag-7</td><td>M1887: one-tap potential at close range.</td></tr>
+                    <tr><td>Sniper Rifles</td><td>AWM, M82B</td><td>Kar98k, Woodpecker</td><td>SVD, M14</td><td>AWM: highest damage. M82B: gloo/vehicle pierce.</td></tr>
+                    <tr><td>LMGs</td><td>M249</td><td>Gatling</td><td>M60</td><td>M249: huge mag, suppressive fire.</td></tr>
+                    <tr><td>Pistols</td><td>Desert Eagle</td><td>G18, USP</td><td>M500</td><td>Deagle: high damage, slow fire rate.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ========== MAPS ========== -->
+    <section id="maps">
+        <h2>🗺️ Maps <span class="badge">6+</span></h2>
+        <div class="map-grid">
+            <div class="map-card">
+                <div class="map-header">🏝️ Bermuda</div>
+                <div class="map-body">
+                    <p><strong>Size:</strong> Medium | <strong>Terrain:</strong> Tropical island</p>
+                    <p>The original FF map. Mix of dense forest, beaches, and urban areas.</p>
+                    <p style="margin-top:6px;color:#888;">Hot drops: Clock Tower, Peak, Bimasakti Strip</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="map-header">🏜️ Kalahari</div>
+                <div class="map-body">
+                    <p><strong>Size:</strong> Small | <strong>Terrain:</strong> Desert / Canyon</p>
+                    <p>Fast-paced. Open sightlines favor snipers.</p>
+                    <p style="margin-top:6px;color:#888;">Hot drops: Refinery, Confession Alley</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="map-header">⛰️ Alpine</div>
+                <div class="map-body">
+                    <p><strong>Size:</strong> Medium | <strong>Terrain:</strong> Snowy mountains</p>
+                    <p>Vertical terrain with cabins and frozen lakes.</p>
+                    <p style="margin-top:6px;color:#888;">Hot drops: Ski Lodge, Frozen Lake</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="map-header">🌋 Purgatory</div>
+                <div class="map-body">
+                    <p><strong>Size:</strong> Medium | <strong>Terrain:</strong> Volcanic / Ruins</p>
+                    <p>Lava fields and ancient ruins. Zone damage near lava.</p>
+                    <p style="margin-top:6px;color:#888;">Hot drops: Cathedral, Colosseum</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="map-header">🌿 Bermuda Remastered</div>
+                <div class="map-body">
+                    <p><strong>Size:</strong> Medium | <strong>Terrain:</strong> Enhanced Bermuda</p>
+                    <p>Updated assets, new buildings, better loot distribution.</p>
+                    <p style="margin-top:6px;color:#888;">Hot drops: Central Tower, Riverside</p>
+                </div>
+            </div>
+            <div class="map-card">
+                <div class="map-header">🤖 NEXTerra</div>
+                <div class="map-body">
+                    <p><strong>Size:</strong> Medium | <strong>Terrain:</strong> Futuristic / Neon</p>
+                    <p>Sci-fi theme with teleporters and high-tech zones.</p>
+                    <p style="margin-top:6px;color:#888;">Hot drops: Neon City, Lab Complex</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== GAME MODES ========== -->
+    <section id="modes">
+        <h2>🎮 Game Modes <span class="badge">5+</span></h2>
+        <div class="card-grid">
+            <div class="card"><h3>🥇 Battle Royale</h3><p>50 players → last standing wins. Solo, Duo, or Squad. Classic FF experience.</p></div>
+            <div class="card"><h3>⚡ Clash Squad</h3><p>4v4 round-based. Buy weapons between rounds. First to 4 wins.</p></div>
+            <div class="card"><h3>🏆 Ranked BR</h3><p>Same as BR but with elo/stars. Climb from Bronze → Grandmaster.</p></div>
+            <div class="card"><h3>🐺 Lone Wolf</h3><p>1v1 duels. First to 5 wins. Pure skill — no teammates.</p></div>
+            <div class="card"><h3>🎯 Ranked CS</h3><p>Clash Squad with ranked progression. Star-based system.</p></div>
+        </div>
+    </section>
+
+    <!-- ========== SENSITIVITY (max 200) ========== -->
+    <section id="sensitivity">
+        <h2>🎯 Sensitivity Settings <span class="badge">Max 200</span></h2>
+        <p style="margin-bottom:16px;color:#a0a0c0;">
+            Updated to the 200-scale system. All values range 0–200. Lower DPI phones = higher sensitivity needed.
+            Adjust ±5 based on your device feel.
+        </p>
+        <div class="sens-grid">
+            <div class="sens-item">
+                <div class="label">General</div>
+                <div class="value">140–200</div>
+                <div style="font-size:11px;color:#888;">Overall camera speed</div>
+            </div>
+            <div class="sens-item">
+                <div class="label">Red Dot</div>
+                <div class="value">0–195</div>
+                <div style="font-size:11px;color:#888;">1x scope (0 = gyro aim)</div>
+            </div>
+            <div class="sens-item">
+                <div class="label">2x Scope</div>
+                <div class="value">0–195</div>
+                <div style="font-size:11px;color:#888;">2x magnification</div>
+            </div>
+            <div class="sens-item">
+                <div class="label">4x Scope</div>
+                <div class="value">50–190</div>
+                <div style="font-size:11px;color:#888;">4x magnification</div>
+            </div>
+            <div class="sens-item">
+                <div class="label">Sniper Scope</div>
+                <div class="value">20–200</div>
+                <div style="font-size:11px;color:#888;">6x / 8x scope</div>
+            </div>
+            <div class="sens-item">
+                <div class="label">Free Look</div>
+                <div class="value">50–200</div>
+                <div style="font-size:11px;color:#888;">Camera while running</div>
+            </div>
+        </div>
+
+        <h3 style="color:#e94560;margin-top:28px;margin-bottom:14px;font-size:16px;">📱 RAM-Based Recommended Ranges (0–200 Scale)</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>RAM</th><th>General</th><th>Red Dot</th><th>2x Scope</th><th>4x Scope</th><th>Sniper</th><th>Free Look</th></tr></thead>
+                <tbody>
+                    <tr><td>2 GB</td><td>190–200</td><td>180–195</td><td>180–195</td><td>180–190</td><td>180–200</td><td>190–200</td></tr>
+                    <tr><td>3 GB</td><td>180–195</td><td>170–190</td><td>170–190</td><td>165–185</td><td>160–190</td><td>175–195</td></tr>
+                    <tr><td>4 GB</td><td>165–185</td><td>155–180</td><td>155–180</td><td>150–175</td><td>140–170</td><td>160–185</td></tr>
+                    <tr><td>6 GB</td><td>150–170</td><td>140–165</td><td>140–165</td><td>130–160</td><td>120–155</td><td>145–175</td></tr>
+                    <tr><td>8 GB</td><td>140–165</td><td>100–160</td><td>120–160</td><td>100–150</td><td>80–150</td><td>140–170</td></tr>
+                    <tr><td>12 GB+</td><td>120–155</td><td>85–150</td><td>100–150</td><td>80–140</td><td>80–90</td><td>120–150</td></tr>
+                
+                    
+                <footer style="position: fixed; bottom: 0; width: 100%; background-color: #080808; color: rgb(5, 4, 4); text-align: center; padding: 10px;"><marquee behavior="normal" direction="left to right" bgcolor="white"><b>HACKER.ANANT</b></marquee></footer>
+
+
+
+                
